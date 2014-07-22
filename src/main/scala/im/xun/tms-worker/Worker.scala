@@ -12,7 +12,11 @@ class Worker extends Actor with ActorLogging {
     case TmsCheckRequest =>
       log.info("Get Tms Check Request Message!")
       /*flakiness*/
-      context.parent ! TmsCheckSuccess
+      val result = TmsRun.run()
+      if(result == true)
+        context.parent ! TmsCheckSuccess
+      else
+        context.parent ! TmsCheckFail
     case _ =>
       log.info("Other Message")
   }
