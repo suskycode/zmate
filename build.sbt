@@ -10,5 +10,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "org.scalatest" %% "scalatest" % "2.1.6" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4",
-  "org.seleniumhq.selenium" % "selenium-java" % "2.42.2"
+  "org.seleniumhq.selenium" % "selenium-java" % "2.42.2",
+  "org.quartz-scheduler" % "quartz" % "2.2.1",
+  "org.quartz-scheduler" % "quartz-jobs" % "2.2.1"
 )

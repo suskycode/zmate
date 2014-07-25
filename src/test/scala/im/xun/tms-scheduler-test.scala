@@ -20,7 +20,7 @@ class SchedulerSpec extends FlatSpec {
     val dateStr = "2014-05-02 17:05:22"
     val date = format.parse(dateStr)
     val res = TmsChecker.ruleBlacklist(date)
-    assert(res == true)
+    assert(res == false)
   }
 
   it should "blacklist check 2" in {
@@ -28,7 +28,7 @@ class SchedulerSpec extends FlatSpec {
     val dateStr = "2014-05-02 18:05:22"
     val date = format.parse(dateStr)
     val res = TmsChecker.ruleBlacklist(date)
-    assert(res == true)
+    assert(res == false)
   }
 
   it should "blacklist check 3" in {
@@ -36,7 +36,7 @@ class SchedulerSpec extends FlatSpec {
     val dateStr = "2017-05-02 17:05:22"
     val date = format.parse(dateStr)
     val res = TmsChecker.ruleBlacklist(date)
-    assert(res == false)
+    assert(res == true)
   }
 
 
