@@ -2,6 +2,8 @@ name := "zmate"
 
 version := "1.0"
 
+scalacOptions := Seq("-feature", "-unchecked", "-deprecation", "-encoding", "utf8")
+
 scalaVersion := "2.11.1"
 
 libraryDependencies ++= Seq(
