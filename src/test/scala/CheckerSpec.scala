@@ -16,9 +16,14 @@ class CheckerSpec(_system: ActorSystem)
 
   val timeCheckActor = system.actorOf(Props[Checker],
     "Time-Checker")
+  val configMonitorActor = system.actorOf(ConfigMonitorActor.props("tms.conf"))
 
   "The Time Checker" should "return ture if now = 50" in {
     timeCheckActor !  "getstatus"
     //expectMsg(true)
+  }
+
+  "ConfigMoitor Actor" should "monitor file change" in {
+    configMonitorActor ! "hello"
   }
 }

@@ -7,30 +7,16 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class Checker extends Actor with ActorLogging {
-  import context._
 
-  override  def  preStart()  = {
-    system.scheduler.scheduleOnce(1 seconds, self, "tick")
-  }
+  val configMonitorActor = context.actorOf(ConfigMonitorActor.props("holiday.txt"), "tms-conf-monitor")
+  val configMonitorActor = context.actorOf(ConfigMonitorActor.props("deholiday.txt"), "tms-conf-monitor")
 
-  //  override  postRestart  so  we  don’t  call  preStart  and  schedule  a  new  message
-  override  def  postRestart(reason:  Throwable)  =  {}
-
-  var res=false
   def receive = {
     case "tick" =>
       /*log.info("TmsChecker tick")*/
-      res = TmsChecker.check()
-      if(res == true) {
-        log.info("TmsChecker positive!, notify Supervisor!")
-        res = false
-        context.parent ! TmsCheckRequest
-      }
-      system.scheduler.scheduleOnce(1 seconds, self, "tick")
-      /*system.scheduler.scheduleOnce(1 minutes, self, "tick")*/
 
     case "getstatus" =>
-      sender() ! res
+//      sender() ! res
 
     case _ =>
       log.info("Other Message")

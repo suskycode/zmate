@@ -19,7 +19,7 @@ class SchedulerSpec extends FlatSpec {
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val dateStr = "2014-05-02 17:05:22"
     val date = format.parse(dateStr)
-    val res = TmsChecker.ruleBlacklist(date)
+    val res = TmsChecker.ruleHoliday(date)
     assert(res == false)
   }
 
@@ -27,7 +27,7 @@ class SchedulerSpec extends FlatSpec {
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val dateStr = "2014-05-02 18:05:22"
     val date = format.parse(dateStr)
-    val res = TmsChecker.ruleBlacklist(date)
+    val res = TmsChecker.ruleHoliday(date)
     assert(res == false)
   }
 
@@ -35,8 +35,8 @@ class SchedulerSpec extends FlatSpec {
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val dateStr = "2017-05-02 17:05:22"
     val date = format.parse(dateStr)
-    val res = TmsChecker.ruleBlacklist(date)
-    assert(res == true)
+    val res = TmsChecker.ruleHoliday(date)
+    assert(res ==  true)
   }
 
 
