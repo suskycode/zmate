@@ -8,10 +8,12 @@ import scala.language.postfixOps
 
 class Checker extends Actor with ActorLogging {
 
-  val configMonitorActor = context.actorOf(ConfigMonitorActor.props("holiday.txt"), "tms-conf-monitor")
-  val configMonitorActor = context.actorOf(ConfigMonitorActor.props("deholiday.txt"), "tms-conf-monitor")
+  val configMonitorActor1 = context.actorOf(ConfigMonitorActor.props("holiday.txt"), "holiday-monitor")
+//  val configMonitorActor2 = context.actorOf(ConfigMonitorActor.props("deholiday.txt"), "deholiday-monitor")
 
   def receive = {
+    case TmsConfigFileUpdate =>
+
     case "tick" =>
       /*log.info("TmsChecker tick")*/
 

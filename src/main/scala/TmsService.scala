@@ -16,19 +16,19 @@ class TmsService extends Actor with ActorLogging {
 
   val worker = context.actorOf(Props[Worker],"tms-worker")
   val checker = context.actorOf(Props[Checker], "tms-checker")
-  var retry = 3;
+  var retry = 3
 
   def receive = {
     case TmsCheckRequest =>
       log.info("Get TmsCheckRequest Message!")
-      retry = 3;
+      retry = 3
       worker ! TmsCheckRequest
 
     case TmsCheckSuccess =>
-      log.info("Tms Check Sucess!")
+      log.info("Tms Check Success!")
 
     case TmsCheckFail =>
-      retry = retry -1;
+      retry = retry - 1
       if(retry > 0) {
         log.info("Tms Check Fail! Retry {}.", retry)
         worker ! TmsCheckRequest

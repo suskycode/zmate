@@ -5,21 +5,42 @@ import java.time.LocalTime
 import java.time.LocalDateTime
 
 object TmsChecker {
-  def getCheckPoints(): Stream[Int] = {
+  def getCheckPoints(dayStream: Stream[LocalDate]): Stream[Int] = {
+
+
     val checkPointAm = LocalTime.parse("08:00")
     val checkPointPm = LocalTime.parse("18:00")
 
+    val s1 = dayStream.map(day => getRemainSeconds(day, checkPointAm))
+    val s2 = dayStream.map(day => getRemainSeconds(day, checkPointPm))
+
+    dropZeroHead(mergeStream(s1, s2))
+  }
+
+  def dropZeroHead(s: Stream[Int]): Stream[Int] = {
+    if(s.head == 0)
+      dropZeroHead(s.tail)
+    else
+      s
+  }
+
+  def getRemainSeconds(day: LocalDate, time: LocalTime): Int = {
     val now = LocalDateTime.now
-    
-    workdayStream
-  }
-  def check(): Boolean = {
-//    val now = LocalTime.now
-    val checkPointAm = LocalTime.parse("08:00")
-    val checkPointPm = LocalTime.parse("18:00")
+    val to = LocalDateTime.of(day, time)
+    if(to.compareTo(now) < 1) {
+      0
+    }
+    else {
+      getSecondsOfYear(to) - getSecondsOfYear(now);
+    }
 
-    false
   }
+
+  def getSecondsOfYear(dt: LocalDateTime) = {
+    dt.getDayOfYear * 24 * 60 * 60 + dt.getHour * 60 * 60 + dt.getMinute * 60 + dt.getSecond
+  }
+
+
 
   def ruleDefault(day: LocalDate): Boolean = {
     val dayOfWeek = day.getDayOfWeek.getValue
@@ -69,10 +90,14 @@ object TmsChecker {
 
   def dayStream = Stream.iterate(LocalDate.now)(_ plusDays 1)
 
-  def workdayStream = dayStream.filter(ruleAll)
 
-  def loadConfig(): Stream[LocalDate] = {
-    workdayStream
+  def loadConfig(): Stream[Int] = {
+    val workdayStream = dayStream.filter(ruleAll)
+    getCheckPoints(workdayStream)
+  }
+
+  def mergeStream(s1: Stream[Int], s2: Stream[Int]):Stream[Int] = {
+    s1.head #:: s2.head #:: mergeStream(s1.tail, s2.tail)
   }
 
 }

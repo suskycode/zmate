@@ -21,14 +21,33 @@ class ConfigMonitorActor(filename: String) extends Actor with ActorLogging {
   override def postRestart(reason:  Throwable)  =  {}
 
   var lastModify: Long = 0
+  val checkingPool = scala.collection.mutable.ListBuffer.empty[Cancellable]
+
+
+  def cancelAll(pool: List[Cancellable]): Unit ={
+    pool.foreach(p => p.cancel())
+  }
 
   def receive = {
     case "tick" =>
       log.info("Ticker")
+      val a = java.time.LocalTime.now
+      println(a)
       if(getLastModify > lastModify) {
         log.info("Config file change detected! reload config")
+        context.parent ! TmsConfigFileUpdate
+        cancelAll(checkingPool.toList)
+
+
         lastModify = getLastModify
-        val tmsDay = TmsChecker.loadConfig()
+        val tmsCheckPointStream = TmsChecker.loadConfig()
+        tmsCheckPointStream.take(5).foreach(s => println(java.time.LocalTime.now.plusSeconds(s)))
+        val checkPointIterator = tmsCheckPointStream.iterator
+        val checkScheduler =
+          system.scheduler.scheduleOnce(
+            checkPointIterator.next() seconds,
+            self,
+            "check")
       }
       system.scheduler.scheduleOnce(1 seconds, self, "tick")
 
