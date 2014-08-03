@@ -1,11 +1,11 @@
-package im.xun.zmate
+package im.xun.zmate.worker
 
 import akka.actor._
-import akka.actor.SupervisorStrategy.{Escalate, Restart}
-import scala.collection.immutable._
-import scala.concurrent.forkjoin.ThreadLocalRandom
+//import akka.actor.SupervisorStrategy.{Escalate, Restart}
+import im.xun.zmate.{TmsCheckSuccess, TmsCheckFail, TmsCheckRequest}
+//import scala.collection.immutable._
+//import scala.concurrent.forkjoin.ThreadLocalRandom
 
-class TmsException extends Exception("Flakiness")
 
 class Worker extends Actor with ActorLogging {
 	val conf = com.typesafe.config.ConfigFactory.load("tms.conf")
@@ -16,7 +16,7 @@ class Worker extends Actor with ActorLogging {
       log.info("Get Tms Check Request Message!")
       /*flakiness*/
       val result = TmsRun.run(ie_cache_dir)
-      if(result == true)
+      if(result)
         context.parent ! TmsCheckSuccess
       else
         context.parent ! TmsCheckFail
@@ -29,6 +29,4 @@ class Worker extends Actor with ActorLogging {
     context.parent ! TmsCheckFail
   }
 
-  private def flakiness(): Unit =
-      throw new TmsException
 }

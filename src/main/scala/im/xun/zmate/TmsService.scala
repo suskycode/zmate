@@ -2,6 +2,8 @@ package im.xun.zmate
 
 import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.actor.{Props, ActorRef, ActorLogging, Actor, OneForOneStrategy, Status}
+import im.xun.zmate.checker.Checker
+import im.xun.zmate.worker.Worker
 
 class TmsService extends Actor with ActorLogging {
 

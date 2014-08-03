@@ -1,12 +1,12 @@
-package im.xun.zmate
+package im.xun.zmate.checker
 
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit.SECONDS
 
-object TmsChecker {
-  def getCheckPoints(dayStream: Stream[LocalDate]): Stream[Int] = {
-
+object TmsScheduler {
+  def getCheckPoints(dayStream: Stream[LocalDate]): Stream[Long] = {
 
     val checkPointAm = LocalTime.parse("08:00")
     val checkPointPm = LocalTime.parse("18:00")
@@ -14,33 +14,25 @@ object TmsChecker {
     val s1 = dayStream.map(day => getRemainSeconds(day, checkPointAm))
     val s2 = dayStream.map(day => getRemainSeconds(day, checkPointPm))
 
-    dropZeroHead(mergeStream(s1, s2))
+    val s3 = mergeStreams(s1, s2)
+    val s4 = ruleZero.toStream
+    val s5 = mergeStreams(s3, s4)
+
+    s5.filter(_ > 0)
   }
 
-  def dropZeroHead(s: Stream[Int]): Stream[Int] = {
-    if(s.head == 0)
-      dropZeroHead(s.tail)
-    else
-      s
+  def ruleZero: List[Long] = {
+    val checkPoints = getTimeFromFile("rulezero.txt")
+    val now = LocalDateTime.now
+    checkPoints.map(cp => SECONDS.between(now, cp))
   }
 
-  def getRemainSeconds(day: LocalDate, time: LocalTime): Int = {
+  def getRemainSeconds(day: LocalDate, time: LocalTime): Long = {
     val now = LocalDateTime.now
     val to = LocalDateTime.of(day, time)
-    if(to.compareTo(now) < 1) {
-      0
-    }
-    else {
-      getSecondsOfYear(to) - getSecondsOfYear(now);
-    }
-
+    val salt = scala.util.Random.nextLong % 600
+    SECONDS.between(now, to) + salt
   }
-
-  def getSecondsOfYear(dt: LocalDateTime) = {
-    dt.getDayOfYear * 24 * 60 * 60 + dt.getHour * 60 * 60 + dt.getMinute * 60 + dt.getSecond
-  }
-
-
 
   def ruleDefault(day: LocalDate): Boolean = {
     val dayOfWeek = day.getDayOfWeek.getValue
@@ -68,6 +60,25 @@ object TmsChecker {
     result
   }
 
+  def getTimeFromFile(file: String): List[LocalDateTime]= {
+    val f = scala.io.Source.fromFile(file)
+    val res = scala.collection.mutable.ListBuffer.empty[LocalDateTime]
+    for(t <- f.getLines()) {
+      try{
+        LocalDateTime.parse(t) match {
+          case time : LocalDateTime =>
+            res += time
+        }
+      }
+      catch {
+        case e: Exception =>
+          println("Rule file datetime format error:" + file + "" + t)
+      }
+    }
+    f.close()
+    res.toList
+ }
+
   def ruleHoliday(day: LocalDate): Boolean = {
     dayInFile(day, "holiday.txt")
   }
@@ -90,15 +101,15 @@ object TmsChecker {
 
   def dayStream = Stream.iterate(LocalDate.now)(_ plusDays 1)
 
-
-  def loadConfig(): Stream[Int] = {
+  def loadConfig(): Stream[Long] = {
     val workdayStream = dayStream.filter(ruleAll)
     getCheckPoints(workdayStream)
   }
 
-  def mergeStream(s1: Stream[Int], s2: Stream[Int]):Stream[Int] = {
-    s1.head #:: s2.head #:: mergeStream(s1.tail, s2.tail)
+  def mergeStreams(s1: Stream[Long], s2: Stream[Long]):Stream[Long] = {
+    if (s1.isEmpty) s2
+    else if (s2.isEmpty) s1
+    else if (s1.head < s2.head) s1.head #:: mergeStreams(s1.tail, s2)
+    else s2.head #:: mergeStreams(s1, s2.tail)
   }
-
 }
-
