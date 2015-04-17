@@ -46,6 +46,6 @@ sbt run
 
 ## 关键技术
 
-1.  [Selenium Webdriver](www.seleniumhq.org/projects/webdriver/)：通过webdriver协议驱动浏览器执行操作，除了IE，还支持其他所有主流浏览器，网站无法从数据包层面区分浏览点击是webdriver驱动的还是真实用户发起的，理论上可以突破最严格的爬虫限制网站。
+1.  [Selenium Webdriver](www.seleniumhq.org/projects/webdriver/)：通过webdriver协议驱动浏览器执行操作，除了IE还支持其他所有主流浏览器，被访问网站无法从数据包层面区分浏览点击是webdriver驱动的还是真实用户发起的，理论上可以突破最严格的爬虫限制网站。
 2. [tesseract](https://code.google.com/p/tesseract-ocr/)：开源OCR工具，用于识别校验码。默认识别效果不好（正确率80%左右），通过[训练](https://code.google.com/p/tesseract-ocr/wiki/TrainingTesseract3)后，识别率可以达到99%左右（抓了几百张校验码测试）。训练生成的文件（https://github.com/wuhx/zmate/blob/master/ocr/tessdata/kng.traineddata)
-3. [akka](http://akka.io/)：一个借鉴erlang的OTP模型的scala库，是zmate代码架构基础。
+3. [akka](http://akka.io/)：一个借鉴Erlang/OTP模型实现的scala库，是zmate代码架构基础。
